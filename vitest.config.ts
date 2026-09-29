@@ -11,6 +11,7 @@ export default defineConfig({
         bindings: {
           // Secreto solo para tests: fuerza la rama HS256 del verificador sin tocar la red.
           SUPABASE_JWT_SECRET: "secreto-de-prueba-no-usar-en-produccion-0123456789abcdef",
+          SUPABASE_ANON_KEY: "anon-key-de-prueba",
         },
       },
     }),

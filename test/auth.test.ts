@@ -1,6 +1,6 @@
 import { env, SELF } from "cloudflare:test";
 import { SignJWT } from "jose";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const USER_ID = "01920000-0000-7000-8000-000000000001"; // UUID v7 de prueba
 
@@ -31,6 +31,8 @@ function get(path: string, token?: string): Promise<Response> {
 }
 
 describe("GET /v1/me", () => {
+  afterEach(() => vi.restoreAllMocks());
+
   describe("cuando no hay header Authorization", () => {
     it("responde 401", async () => {
       const res = await get("/v1/me");
@@ -84,6 +86,7 @@ describe("GET /v1/me", () => {
 
   describe("cuando el token es válido", () => {
     it("responde 200 con el userId del sub y el rol", async () => {
+      vi.spyOn(globalThis, "fetch").mockImplementation(async () => Response.json("ACTIVA"));
       const token = await tokenDePrueba();
       const res = await get("/v1/me", token);
 
