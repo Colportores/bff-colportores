@@ -24,7 +24,7 @@ Recibe los lotes del motor batch de sincronización ([ADR-006](https://github.co
 | Ruta | Auth | Qué hace |
 |---|---|---|
 | `GET /health` | no | Liveness: `{ status, servicio, entorno }` |
-| `GET /v1/me` | JWT | Identidad mínima del usuario (`sub`, rol de Postgres, expiración). Ruta de referencia para las siguientes. |
+| `GET /v1/me` | JWT | Identidad mínima (`userId`, `role`, `expiraEn`) más `estado` de la cuenta: `ACTIVA`, `PENDIENTE_ASIGNACION` o `SUSPENDIDA` (RPC `estado_cuenta()` con el JWT del usuario, HU-AUTH-008). Errores: `401 unauthorized`, `404 perfil_no_encontrado`, `502 upstream_error`, `504 upstream_timeout`. Requiere `SUPABASE_ANON_KEY` (clave pública, header `apikey` de PostgREST) en `.dev.vars` o `wrangler secret put`. |
 | `/v1/sync/*` | JWT | *(Sprint 3+)* rutas del motor batch — dueño `@BrunoFCapri` ([ADR-017](https://github.com/Colportores/docs-organizacion/blob/main/docs/decisiones/ADR-017-sync-engine-paquete.md)) |
 
 Todo `/v1/*` pasa por `requireAuth` (`src/middleware/auth.ts`): exige `Authorization: Bearer <jwt>` emitido por Supabase Auth del proyecto configurado en `SUPABASE_URL`. Verifica firma (JWKS del proyecto, o HS256 si se define `SUPABASE_JWT_SECRET` en proyectos legacy), emisor, audiencia `authenticated` y expiración. Nada más: los permisos los decide la RLS con ese mismo JWT.

@@ -5,6 +5,7 @@ interface __BaseEnv_Env {
 	ENVIRONMENT: "staging" | "production" | "development";
 	SUPABASE_URL: "https://REEMPLAZAR-staging.supabase.co" | "https://REEMPLAZAR-prod.supabase.co" | "http://127.0.0.1:54321";
 	SUPABASE_JWT_SECRET: string;
+	SUPABASE_ANON_KEY: string;
 }
 declare namespace Cloudflare {
 	interface GlobalProps {
@@ -14,11 +15,13 @@ declare namespace Cloudflare {
 		ENVIRONMENT: "staging";
 		SUPABASE_URL: "https://REEMPLAZAR-staging.supabase.co";
 		SUPABASE_JWT_SECRET: string;
+	SUPABASE_ANON_KEY: string;
 	}
 	interface ProductionEnv {
 		ENVIRONMENT: "production";
 		SUPABASE_URL: "https://REEMPLAZAR-prod.supabase.co";
 		SUPABASE_JWT_SECRET: string;
+	SUPABASE_ANON_KEY: string;
 	}
 	interface Env extends __BaseEnv_Env {}
 }
@@ -27,7 +30,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "ENVIRONMENT" | "SUPABASE_URL" | "SUPABASE_JWT_SECRET">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "ENVIRONMENT" | "SUPABASE_URL" | "SUPABASE_JWT_SECRET" | "SUPABASE_ANON_KEY">> {}
 }
 
 // Begin runtime types
