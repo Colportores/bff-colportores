@@ -41,6 +41,8 @@ docker compose -f compose.dev.yml run --rm bff npm test       # solo tests
 docker compose -f compose.dev.yml run --rm bff npm run types  # regenerar worker-configuration.d.ts
 ```
 
+- **Imagen y cachés compartidas.** `-p <nombre>` propio está bien para aislar contenedores y `node_modules`; la imagen (`bff-colportores-dev:latest`) es compartida por todos los proyectos.
+  `docker compose build` solo cuando cambia `dockerfile.dev`.
 - `dockerfile.dev` define la imagen; `node_modules` vive en un volumen nombrado (no en el host).
 - Secretos locales en `.dev.vars` (copiar de `.dev.vars.example`; ignorado por git). Config no secreta en `wrangler.jsonc → vars`.
 - `worker-configuration.d.ts` lo genera `wrangler types` y **se commitea**; CI verifica que esté al día. Nunca escribir la interfaz `Env` a mano.
