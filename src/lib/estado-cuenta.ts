@@ -28,6 +28,11 @@ export async function obtenerEstadoCuenta(
   env: Pick<Env, "SUPABASE_URL" | "SUPABASE_ANON_KEY">,
   jwt: string,
 ): Promise<EstadoCuenta> {
+  // Un secret olvidado en un entorno no debe parecer un JWT vencido (desloguearía a todos).
+  if (!env.SUPABASE_ANON_KEY) {
+    log.error("NET", "ANON_KEY_FALTANTE", "falta el binding SUPABASE_ANON_KEY");
+    throw new EstadoCuentaError(502, "upstream_error");
+  }
   let res: Response;
   try {
     res = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/estado_cuenta`, {
@@ -55,7 +60,10 @@ export async function obtenerEstadoCuenta(
   if (!res.ok) {
     const cuerpo = (await res.json().catch(() => null)) as { code?: unknown } | null;
     const code = typeof cuerpo?.code === "string" ? cuerpo.code : undefined;
-    if (res.status === 401 || res.status === 403 || code === "42501") {
+    // Solo es "JWT del usuario inválido" si PostgREST lo dice con su code (PGRST301/303 = JWT,
+    // 42501 = sin permiso). Un 401 sin code lo devuelve el gateway por una API key inválida:
+    // es un problema de configuración nuestro, no del usuario.
+    if (code === "42501" || code === "PGRST301" || code === "PGRST303") {
       throw new EstadoCuentaError(401, "unauthorized");
     }
     if (code === "P0002") throw new EstadoCuentaError(404, "perfil_no_encontrado");

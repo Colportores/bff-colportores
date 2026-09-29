@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { EstadoCuentaError, obtenerEstadoCuenta } from "../lib/estado-cuenta";
+import { extraerBearer } from "../middleware/auth";
 import type { AppEnv } from "../types";
 
 /**
@@ -12,7 +13,7 @@ import type { AppEnv } from "../types";
  */
 export const me = new Hono<AppEnv>().get("/", async (c) => {
   const { userId, role, claims } = c.get("auth");
-  const jwt = c.req.header("Authorization")?.split(" ")[1] ?? "";
+  const jwt = extraerBearer(c.req.header("Authorization")) ?? "";
   try {
     const estado = await obtenerEstadoCuenta(c.env, jwt);
     return c.json({

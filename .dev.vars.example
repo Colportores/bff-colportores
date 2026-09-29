@@ -4,3 +4,7 @@
 # el JWT secret simétrico. Con claves asimétricas (default en proyectos nuevos) dejarlo vacío:
 # el BFF valida contra ${SUPABASE_URL}/auth/v1/.well-known/jwks.json.
 SUPABASE_JWT_SECRET=
+
+# Anon key (publica) del proyecto Supabase: PostgREST la exige en el header apikey. Obligatoria:
+# sin ella /v1/me responde 502. En local sale de `supabase status` (ANON_KEY / anon key) en backend-supabase.
+SUPABASE_ANON_KEY=

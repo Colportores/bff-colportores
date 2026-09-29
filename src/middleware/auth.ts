@@ -53,7 +53,7 @@ export async function verificarJwtSupabase(
   return payload;
 }
 
-function extraerBearer(header: string | undefined): string | null {
+export function extraerBearer(header: string | undefined): string | null {
   if (!header) return null;
   const [esquema, token] = header.split(" ");
   if (esquema?.toLowerCase() !== "bearer" || !token) return null;

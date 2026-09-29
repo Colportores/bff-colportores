@@ -1,6 +1,7 @@
 import { env, SELF } from "cloudflare:test";
 import { SignJWT } from "jose";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { obtenerEstadoCuenta } from "../src/lib/estado-cuenta";
 
 async function token(): Promise<string> {
   return new SignJWT({ role: "authenticated" })
@@ -81,5 +82,24 @@ describe("GET /v1/me — estado de la cuenta", () => {
   it("valor desconocido -> 502 upstream_error", async () => {
     fetchMock.mockImplementation(async () => Response.json("OTRA"));
     expect(await me(await token())).toEqual({ status: 502, body: { error: "upstream_error" } });
+  });
+
+  it("PGRST301 (JWT inválido) -> 401 unauthorized", async () => {
+    fetchMock.mockImplementation(async () => Response.json({ code: "PGRST301" }, { status: 401 }));
+    expect(await me(await token())).toEqual({ status: 401, body: { error: "unauthorized" } });
+  });
+
+  it("401 de upstream sin code (API key inválida en el gateway) -> 502, no desloguea", async () => {
+    fetchMock.mockImplementation(async () =>
+      Response.json({ message: "Invalid authentication credentials" }, { status: 401 }),
+    );
+    expect(await me(await token())).toEqual({ status: 502, body: { error: "upstream_error" } });
+  });
+
+  it("sin binding SUPABASE_ANON_KEY -> EstadoCuentaError 502 y no llama a fetch", async () => {
+    await expect(
+      obtenerEstadoCuenta({ SUPABASE_URL: env.SUPABASE_URL, SUPABASE_ANON_KEY: "" }, "jwt"),
+    ).rejects.toMatchObject({ status: 502, codigo: "upstream_error" });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
