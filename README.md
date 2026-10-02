@@ -1,5 +1,7 @@
 # bff-colportores
 
+> **Implementación futura:** diferido por tiempo (decisión 02/10). En la Fase 1 los clientes hablan directo con Supabase; ver [ADR-013](https://github.com/Colportores/docs-organizacion/blob/feature/adr-013-rpc-directo/docs/decisiones/ADR-013-clientes-directo-a-rpc-de-supabase.md) ([docs-organizacion#22](https://github.com/Colportores/docs-organizacion/pull/22)).
+
 BFF de la app móvil de colportores ([front-colportores-mobile](https://github.com/Colportores/front-colportores-mobile)), como Worker de Cloudflare.
 
 **Estado: esqueleto (Sprint 1)** — Worker con Hono, validación de JWT de Supabase Auth, tests dentro de workerd y CI. Las rutas de negocio llegan con las HU de cada sprint.
